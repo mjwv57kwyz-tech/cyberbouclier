@@ -1,0 +1,140 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CyberBouclier</title>
+<style>
+body {
+  margin: 0;
+  padding: 24px;
+  background: #0b1220;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+.card {
+  background: #172338;
+  border: 1px solid #30415b;
+  border-radius: 18px;
+  padding: 20px;
+  margin-top: 20px;
+}
+h1 { color: #79aaff; }
+button, a {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 15px;
+  margin-top: 12px;
+  border: 0;
+  border-radius: 12px;
+  background: #79aaff;
+  color: #081321;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+}
+textarea, select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 10px;
+  font-size: 16px;
+}
+.note { color: #b8c5d8; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<h1>🛡️ CyberBouclier</h1>
+<p class="note">Assistant de sécurité pour Facebook</p>
+
+<div class="card">
+<h2>🔐 Protéger mon compte</h2>
+<p class="note">
+Cette version ne se connecte pas à Facebook.
+Elle ne détecte pas encore automatiquement
+les tentatives de connexion.
+</p>
+<a href="https://www.facebook.com/settings?tab=security">
+Ouvrir la sécurité Facebook
+</a>
+<a href="https://www.facebook.com/hacked">
+Sécuriser un compte compromis
+</a>
+</div>
+
+<div class="card">
+<h2>🚨 Ajouter une alerte</h2>
+<select id="type">
+<option>Tentative de connexion suspecte</option>
+<option>Appareil inconnu</option>
+<option>E-mail suspect</option>
+</select>
+<textarea id="details" rows="3"
+placeholder="Décris l'alerte sans mot de passe ni code"></textarea>
+<button onclick="ajouter()">Enregistrer l'alerte</button>
+<p id="message" class="note"></p>
+</div>
+
+<div class="card">
+<h2>📋 Journal des alertes</h2>
+<div id="journal" class="note">Aucune alerte.</div>
+</div>
+
+<script>
+function ajouter() {
+  const champ = document.getElementById("details");
+  const texte = champ.value.trim();
+
+  if (!texte) {
+    document.getElementById("message").textContent =
+      "Décris d'abord l'alerte.";
+    return;
+  }
+
+  const alertes = JSON.parse(
+    localStorage.getItem("cb_alertes") || "[]"
+  );
+
+  alertes.unshift({
+    type: document.getElementById("type").value,
+    texte: texte,
+    date: new Date().toLocaleString("fr-FR")
+  });
+
+  localStorage.setItem("cb_alertes", JSON.stringify(alertes));
+  champ.value = "";
+  document.getElementById("message").textContent =
+    "Alerte enregistrée sur cet appareil.";
+  afficher();
+}
+
+function afficher() {
+  const alertes = JSON.parse(
+    localStorage.getItem("cb_alertes") || "[]"
+  );
+  const journal = document.getElementById("journal");
+  journal.replaceChildren();
+
+  if (!alertes.length) {
+    journal.textContent = "Aucune alerte.";
+    return;
+  }
+
+  alertes.forEach(a => {
+    const bloc = document.createElement("p");
+    bloc.textContent = "🚨 " + a.type + " — " +
+      a.texte + " (" + a.date + ")";
+    journal.appendChild(bloc);
+  });
+}
+
+afficher();
+</script>
+
+</body>
+</html>
